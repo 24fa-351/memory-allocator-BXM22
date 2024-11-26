@@ -3,9 +3,13 @@
 
 #include <stddef.h>
 
-void * my_malloc(size_t size);
-void my_free(void * ptr);
-void * my_realloc(size_t nmemb, size_t size);
+void * requestBlock(size_t size);
+void * initialMemory(size_t size);
+void * mem_malloc(size_t size);
+void mem_free(void * ptr);
+void * mem_realloc(size_t nmemb, size_t size);
+void destroyHeap();
+
 
 
 #endif // MEM_MANAGER_H

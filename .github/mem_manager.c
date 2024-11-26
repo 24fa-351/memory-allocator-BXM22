@@ -1,15 +1,67 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
+#include <pthread.h>
 
 #include "mem_manager.h"
 
-#define MEM_SIZE 1000
 
 typedef struct mem_block {
-    void * data;
+    size_t size;
+    int data;
     struct mem_block * next;
 } mem_block;
 
-void * my_malloc(size_t size);
-void my_free(void * ptr);
-void * my_realloc(size_t nmemb, size_t size);
+#define BLOCK_SIZE sizeof(mem_block)
+
+static void* heap_start = NULL;
+static mem_block* free_list = NULL;
+static pthread_mutex_t heap_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void * requestBlock(size_t size){
+    mem_block * block = free_list;
+    mem_block * prev = NULL;
+    while(block != NULL){
+        if(block->size >= size){
+            if(prev != NULL){
+                prev->next = block->next;
+            }else{
+                free_list = block->next;
+            }
+            return block;
+        }
+        prev = block;
+        block = block->next;
+    }
+    return NULL;
+}
+
+void * initialMemory(size_t size){
+    void * ptr = sbrk(size);
+    if(ptr == (void *) -1){
+        return NULL;
+    }
+    return ptr;
+}
+void * mem_malloc(size_t size){
+    if(size == 0){
+        return NULL;
+    }
+    pthread_mutex_lock(&heap_lock);
+
+    mem_block * block = requestBlock(size);
+    if(!heap_start){
+        heap_start = sbrk(size + BLOCK_SIZE);
+    }
+    pthread_mutex_unlock(&heap_lock);
+
+}
+void mem_free(void * ptr);
+void * mem_realloc(size_t nmemb, size_t size);
+
+void destroyHeap(){
+    pthread_mutex_lock(&heap_lock);
+    heap_start = NULL;
+    free_list = NULL;
+    pthread_mutex_unlock(&heap_lock);
+}

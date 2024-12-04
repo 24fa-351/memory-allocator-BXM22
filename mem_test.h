@@ -1,5 +1,5 @@
-#ifndef MEM_MANAGER_H
-#define MEM_MANAGER_H
+#ifndef MEM_TEST_H
+#define MEM_TEST_H
 
 #include <stddef.h>
 
@@ -12,4 +12,4 @@ void destroyHeap();
 
 
 
-#endif // MEM_MANAGER_H
+#endif 

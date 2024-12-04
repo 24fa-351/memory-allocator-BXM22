@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include "mem_manager.h"
+#include "mem_test.h"
 
 
 typedef struct mem_block {
